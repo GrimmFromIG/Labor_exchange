@@ -1,21 +1,24 @@
 import streamlit as st
-from dataclasses import asdict
 
 from dal.repository import JsonRepository
 from bll.services import LaborExchangeService
-from bll.exceptions import ValidationException, EntityNotFoundException
 
-try:
-    repo = JsonRepository(filepath='dal/data.json')
-    service = LaborExchangeService(repository=repo)
-except Exception as e:
-    st.error(f"Помилка ініціалізації сервісу: {e}")
-    st.stop()
+from pl.unemployed_view import show_unemployed_page
+from pl.companies_view import show_companies_page
+from pl.vacancies_view import show_vacancies_page
+from pl.resumes_view import show_resumes_page
 
+def main():
+    try:
+        repo = JsonRepository(filepath='dal/data.json')
+        service = LaborExchangeService(repository=repo)
+    except Exception as e:
+        st.error(f"Помилка ініціалізації сервісу: {e}")
+        st.stop()
 
-st.set_page_config(layout="wide")
-st.title("👨‍💼 Варіант 5: Біржа праці")
-st.caption("Виконав Петрощук Б. С., ФКНТ, Б-121-24-1-ПІ")
+    st.set_page_config(layout="wide")
+    st.title("👨‍💼 Варіант 5: Біржа праці")
+    st.caption("Виконав Петрощук Б. С., ФКНТ, Б-121-24-1-ПІ")
 
 menu_option = st.sidebar.radio(
     "Оберіть розділ:",
@@ -25,7 +28,7 @@ menu_option = st.sidebar.radio(
 def get_selection_options(entity_list, name_attr='name', surname_attr='surname'):
     options = {}
     for item in entity_list:
-        if surname_attr and hasattr(item, surname_attr) and getattr(item, surname_attr):
+        if hasattr(item, surname_attr) and getattr(item, surname_attr):
             label = f"{getattr(item, surname_attr)} {getattr(item, name_attr)} (ID: {item.id})"
         else:
             label = f"{getattr(item, name_attr)} (ID: {item.id})"
@@ -148,7 +151,7 @@ if menu_option == "Безробітні":
                         person_id = options[selected_label]
                         service.delete_unemployed(person_id)
                         st.success(f"Безробітного {selected_label} видалено.")
-                        st.rerun() 
+                        st.experimental_rerun() 
                     except EntityNotFoundException as e:
                         st.error(f"Помилка: {e}")
                     except Exception as e:
@@ -231,7 +234,7 @@ elif menu_option == "Фірми-замовники":
                         company_id = options[selected_label]
                         service.delete_company(company_id)
                         st.success(f"Фірму {selected_label} видалено.")
-                        st.rerun() 
+                        st.experimental_rerun() 
                     except EntityNotFoundException as e:
                         st.error(f"Помилка: {e}")
                     except Exception as e:
@@ -259,7 +262,7 @@ elif menu_option == "Вакансії":
             st.error(f"Помилка завантаження даних: {e}")
         
         st.subheader("Пошук вакансій")
-        keyword_vac = st.text_input("Введіть ключове слово (назва, опис, кваліфікації):")
+        keyword_vac = st.text_input("Введіть ключове слово для пошуку (в назві або описі):")
         if keyword_vac:
             try:
                 results_vac = service.find_vacancies_by_keyword(keyword_vac)
@@ -333,7 +336,7 @@ elif menu_option == "Вакансії":
                         vacancy_id = options[selected_label]
                         service.delete_vacancy(vacancy_id)
                         st.success(f"Вакансію {selected_label} видалено.")
-                        st.rerun() 
+                        st.experimental_rerun() 
                     except EntityNotFoundException as e:
                         st.error(f"Помилка: {e}")
                     except Exception as e:
@@ -433,7 +436,7 @@ elif menu_option == "Резюме":
                         resume_id = options[selected_label]
                         service.delete_resume(resume_id)
                         st.success(f"Резюме {selected_label} видалено.")
-                        st.rerun() 
+                        st.experimental_rerun() 
                     except EntityNotFoundException as e:
                         st.error(f"Помилка: {e}")
                     except Exception as e:
