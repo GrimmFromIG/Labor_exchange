@@ -170,7 +170,9 @@ class LaborExchangeService:
         all_vacancies = self.get_all_vacancies()
         return [
             v for v in all_vacancies 
-            if keyword in v.title.lower() or keyword in v.description.lower()
+            if keyword in v.title.lower() 
+            or keyword in v.description.lower()
+            or keyword in v.qualifications.lower()
         ]
     
     def add_resume(self, title: str, unemployed_id: str, skills: str) -> Resume:

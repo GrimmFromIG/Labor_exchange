@@ -25,7 +25,7 @@ menu_option = st.sidebar.radio(
 def get_selection_options(entity_list, name_attr='name', surname_attr='surname'):
     options = {}
     for item in entity_list:
-        if hasattr(item, surname_attr) and getattr(item, surname_attr):
+        if surname_attr and hasattr(item, surname_attr) and getattr(item, surname_attr):
             label = f"{getattr(item, surname_attr)} {getattr(item, name_attr)} (ID: {item.id})"
         else:
             label = f"{getattr(item, name_attr)} (ID: {item.id})"
@@ -148,7 +148,7 @@ if menu_option == "Безробітні":
                         person_id = options[selected_label]
                         service.delete_unemployed(person_id)
                         st.success(f"Безробітного {selected_label} видалено.")
-                        st.experimental_rerun() 
+                        st.rerun() 
                     except EntityNotFoundException as e:
                         st.error(f"Помилка: {e}")
                     except Exception as e:
@@ -231,7 +231,7 @@ elif menu_option == "Фірми-замовники":
                         company_id = options[selected_label]
                         service.delete_company(company_id)
                         st.success(f"Фірму {selected_label} видалено.")
-                        st.experimental_rerun() 
+                        st.rerun() 
                     except EntityNotFoundException as e:
                         st.error(f"Помилка: {e}")
                     except Exception as e:
@@ -259,7 +259,7 @@ elif menu_option == "Вакансії":
             st.error(f"Помилка завантаження даних: {e}")
         
         st.subheader("Пошук вакансій")
-        keyword_vac = st.text_input("Введіть ключове слово для пошуку (в назві або описі):")
+        keyword_vac = st.text_input("Введіть ключове слово (назва, опис, кваліфікації):")
         if keyword_vac:
             try:
                 results_vac = service.find_vacancies_by_keyword(keyword_vac)
@@ -333,7 +333,7 @@ elif menu_option == "Вакансії":
                         vacancy_id = options[selected_label]
                         service.delete_vacancy(vacancy_id)
                         st.success(f"Вакансію {selected_label} видалено.")
-                        st.experimental_rerun() 
+                        st.rerun() 
                     except EntityNotFoundException as e:
                         st.error(f"Помилка: {e}")
                     except Exception as e:
@@ -433,7 +433,7 @@ elif menu_option == "Резюме":
                         resume_id = options[selected_label]
                         service.delete_resume(resume_id)
                         st.success(f"Резюме {selected_label} видалено.")
-                        st.experimental_rerun() 
+                        st.rerun() 
                     except EntityNotFoundException as e:
                         st.error(f"Помилка: {e}")
                     except Exception as e:
