@@ -5,35 +5,33 @@ def get_new_id():
     return str(uuid4())
 
 @dataclass
-class Unemployed:
+class BaseModel:
     id: str = field(default_factory=get_new_id)
+
+@dataclass
+class Person(BaseModel):
     name: str = ""
     surname: str = ""
-    qualifications: str = "" 
 
 @dataclass
-class Company:
-    id: str = field(default_factory=get_new_id)
+class Unemployed(Person):
+    qualifications: str = ""
+
+@dataclass
+class Company(BaseModel):
     name: str = ""
 
 @dataclass
-class Category:
-    id: str = field(default_factory=get_new_id)
-    name: str = ""
-
-@dataclass
-class Vacancy:
-    id: str = field(default_factory=get_new_id)
+class Document(BaseModel):
     title: str = ""
-    description: str = ""
-    qualifications: str = "" 
-    category_id: str = ""
+    qualifications: str = ""
 
 @dataclass
-class Resume:
-    id: str = field(default_factory=get_new_id)
-    title: str = "" 
+class Vacancy(Document):
+    company_id: str = ""
+    description: str = ""
+
+@dataclass
+class Resume(Document):
     unemployed_id: str = ""
-    qualifications: str = "" 
     skills_description: str = ""
-    category_id: str = ""
