@@ -27,11 +27,11 @@ class VacancyService(GenericService[Vacancy]):
         set1 = set(s.strip().lower() for s in s1.split(',') if s.strip())
         set2 = set(s.strip().lower() for s in s2.split(',') if s.strip())
         
-        if not set1:
+        if not set2:
             return 0.0
             
         intersection = set1.intersection(set2)
-        return len(intersection) / len(set1)
+        return len(intersection) / len(set2)
 
     def find_matches_for_resume(self, resume: Resume, min_match: float = 0.25) -> List[Dict]:
         all_vacancies = self.get_all()
