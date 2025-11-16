@@ -49,7 +49,7 @@ def main():
         "Фірми-замовники": lambda: show_companies_page(company_service, vacancy_service),
         "Вакансії": lambda: show_vacancies_page(vacancy_service, company_service),
         "Резюме": lambda: show_resumes_page(resume_service, unemployed_service),
-        "Підбір (Matching)": lambda: show_matching_page(resume_service, vacancy_service, company_service),
+        "Підбір (Matching)": lambda: show_matching_page(resume_service, vacancy_service, company_service, unemployed_service),
         "Статистика": lambda: show_statistics_page(unemployed_service)
     }
 
