@@ -27,7 +27,7 @@ def main():
         st.stop()
 
     st.set_page_config(layout="wide")
-
+    
     st.markdown("""
         <style>
         h1 a[href^="#"],
@@ -40,7 +40,7 @@ def main():
         }
         </style>
         """, unsafe_allow_html=True)
-    
+
     st.title("👨‍💼 Варіант 5: Біржа праці")
     st.caption("Виконав Петрощук Б. С., ФКНТ, Б-121-24-1-ПІ")
 
@@ -49,7 +49,7 @@ def main():
         "Фірми-замовники": lambda: show_companies_page(company_service, vacancy_service),
         "Вакансії": lambda: show_vacancies_page(vacancy_service, company_service),
         "Резюме": lambda: show_resumes_page(resume_service, unemployed_service),
-        "Підбір (Matching)": lambda: show_matching_page(resume_service, vacancy_service),
+        "Підбір (Matching)": lambda: show_matching_page(resume_service, vacancy_service, company_service),
         "Статистика": lambda: show_statistics_page(unemployed_service)
     }
 
