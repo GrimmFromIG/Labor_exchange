@@ -30,12 +30,12 @@ def main():
 
     st.markdown("""
         <style>
-        h1 > div > a,
-        h2 > div > a,
-        h3 > div > a,
-        h4 > div > a,
-        h5 > div > a,
-        h6 > div > a {
+        h1 a[href^="#"],
+        h2 a[href^="#"],
+        h3 a[href^="#"],
+        h4 a[href^="#"],
+        h5 a[href^="#"],
+        h6 a[href^="#"] {
             display: none !important;
         }
         </style>
