@@ -1,7 +1,7 @@
 import streamlit as st
 from pl.utils import get_selection_options
 
-def show_matching_page(resume_service, vacancy_service):
+def show_matching_page(resume_service, vacancy_service, company_service):
     st.header("🤖 Підбір вакансій та резюме")
 
     st.subheader("Знайти вакансії для резюме")
@@ -24,7 +24,14 @@ def show_matching_page(resume_service, vacancy_service):
                 st.write(f"Знайдено {len(matches)} вакансій:")
                 for match in matches:
                     score_percent = f"{match['score']*100:.0f}%"
-                    st.info(f"**{match['vacancy'].title}** ({score_percent} збіг)")
+                    
+                    try:
+                        company = company_service.get_by_id(match['vacancy'].company_id)
+                        company_name = company.name
+                    except Exception:
+                        company_name = "Компанію не знайдено"
+
+                    st.info(f"**{match['vacancy'].title}** | {company_name} ({score_percent} збіг)")
                     st.write(f"**Вимоги:** {match['vacancy'].qualifications}")
                     st.divider()
             else:
