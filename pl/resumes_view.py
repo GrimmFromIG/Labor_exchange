@@ -1,17 +1,18 @@
 import streamlit as st
 from bll.exceptions import ValidationException, EntityNotFoundException
+from bll.models import Resume
 from pl.utils import get_selection_options
 
-def show_resumes_page(service):
+def show_resumes_page(resume_service, unemployed_service):
     st.header("📑 Управління резюме")
     
     tabs = st.tabs(["Перегляд", "Додати нове", "Редагувати", "Видалити"])
 
     with tabs[0]:
         st.subheader("Список резюме")
-        sort_key_res = st.selectbox("Сортувати за:", options=[("Назвою", "title")], format_func=lambda x: x[0], key="res_sort")
         try:
-            resumes = service.get_all_resumes(sort_by=sort_key_res[1])
+            resumes = resume_service.get_all()
+            resumes.sort(key=lambda x: x.title)
             if resumes:
                 st.dataframe(resumes, use_container_width=True, hide_index=True)
             else:
@@ -22,7 +23,7 @@ def show_resumes_page(service):
     with tabs[1]:
         st.subheader("Додавання резюме")
         try:
-            unemployed_list = service.get_all_unemployed(sort_by="surname")
+            unemployed_list = unemployed_service.get_all()
             options = get_selection_options(unemployed_list, 'name', 'surname')
             
             if not options:
@@ -37,8 +38,13 @@ def show_resumes_page(service):
                     
                     if submitted:
                         try:
-                            resume = service.add_resume(title, unemployed_id, skills)
-                            st.success(f"Додано резюме: {resume.title}. Кваліфікації скопійовано з профілю.")
+                            new_resume = Resume(
+                                title=title, 
+                                unemployed_id=unemployed_id, 
+                                skills_description=skills
+                            )
+                            resume_service.add(new_resume)
+                            st.success(f"Додано резюме: {new_resume.title}. Кваліфікації скопійовано з профілю.")
                         except ValidationException as e:
                             st.error(f"Помилка валідації: {e}")
                         except Exception as e:
@@ -49,7 +55,7 @@ def show_resumes_page(service):
     with tabs[2]:
         st.subheader("Редагування резюме")
         try:
-            resumes = service.get_all_resumes(sort_by="title")
+            resumes = resume_service.get_all()
             options = get_selection_options(resumes, 'title', None)
             
             if not options:
@@ -57,20 +63,20 @@ def show_resumes_page(service):
             else:
                 selected_label = st.selectbox("Оберіть резюме:", options.keys(), key="edit_res_select")
                 selected_id = options[selected_label]
-                resume = service.get_resume_by_id(selected_id)
+                resume = resume_service.get_by_id(selected_id)
                 
                 with st.form("edit_resume_form"):
-                    st.text(f"ID: {resume.id}")
-                    st.text(f"Автор (ID): {resume.unemployed_id}")
                     st.text(f"Кваліфікації (з профілю): {resume.qualifications}")
-                    new_title = st.text_input("Назва", value=resume.title)
-                    new_skills = st.text_area("Опис навичок", value=resume.skills_description)
+                    title = st.text_input("Назва", value=resume.title)
+                    skills = st.text_area("Опис навичок", value=resume.skills_description)
                     submitted = st.form_submit_button("Оновити")
                     
                     if submitted:
                         try:
-                            service.update_resume(resume.id, new_title, new_skills)
-                            st.success(f"Резюме '{new_title}' оновлено.")
+                            resume.title = title
+                            resume.skills_description = skills
+                            resume_service.update(resume)
+                            st.success(f"Резюме '{title}' оновлено.")
                         except ValidationException as e:
                             st.error(f"Помилка валідації: {e}")
                         except Exception as e:
@@ -81,7 +87,7 @@ def show_resumes_page(service):
     with tabs[3]:
         st.subheader("Видалення резюме")
         try:
-            resumes = service.get_all_resumes(sort_by="title")
+            resumes = resume_service.get_all()
             options = get_selection_options(resumes, 'title', None)
             
             if not options:
@@ -92,7 +98,7 @@ def show_resumes_page(service):
                 if st.button("Видалити", type="primary"):
                     try:
                         resume_id = options[selected_label]
-                        service.delete_resume(resume_id)
+                        resume_service.delete(resume_id)
                         st.success(f"Резюме {selected_label} видалено.")
                         st.rerun() 
                     except EntityNotFoundException as e:
