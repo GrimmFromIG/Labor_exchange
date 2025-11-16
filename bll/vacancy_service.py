@@ -23,15 +23,25 @@ class VacancyService(GenericService[Vacancy]):
         all_vacancies = self.get_all()
         return [v for v in all_vacancies if v.company_id == company_id]
 
-    def _calculate_match_score(self, s1: str, s2: str) -> float:
-        set1 = set(s.strip().lower() for s in s1.split(',') if s.strip())
-        set2 = set(s.strip().lower() for s in s2.split(',') if s.strip())
+    def _calculate_match_score(self, s1_vacancy: str, s2_resume: str) -> float:
+        set1_vacancy = set(s.strip().lower() for s in s1_vacancy.split(',') if s.strip())
+        set2_resume = set(s.strip().lower() for s in s2_resume.split(',') if s.strip())
         
-        if not set2:
+        if not set2_resume:
             return 0.0
             
-        intersection = set1.intersection(set2)
-        return len(intersection) / len(set2)
+        intersection = set1_vacancy.intersection(set2_resume)
+        return len(intersection) / len(set2_resume)
+
+    def _calculate_reverse_match_score(self, s1_vacancy: str, s2_resume: str) -> float:
+        set1_vacancy = set(s.strip().lower() for s in s1_vacancy.split(',') if s.strip())
+        set2_resume = set(s.strip().lower() for s in s2_resume.split(',') if s.strip())
+        
+        if not set1_vacancy:
+            return 0.0
+            
+        intersection = set1_vacancy.intersection(set2_resume)
+        return len(intersection) / len(set1_vacancy)
 
     def find_matches_for_resume(self, resume: Resume, min_match: float = 0.25) -> List[Dict]:
         all_vacancies = self.get_all()
@@ -40,4 +50,12 @@ class VacancyService(GenericService[Vacancy]):
             score = self._calculate_match_score(vacancy.qualifications, resume.qualifications)
             if score >= min_match:
                 matches.append({"vacancy": vacancy, "score": score})
+        return sorted(matches, key=lambda x: x["score"], reverse=True)
+
+    def find_matches_for_vacancy(self, vacancy: Vacancy, all_resumes: List[Resume], min_match: float = 0.25) -> List[Dict]:
+        matches = []
+        for resume in all_resumes:
+            score = self._calculate_reverse_match_score(vacancy.qualifications, resume.qualifications)
+            if score >= min_match:
+                matches.append({"resume": resume, "score": score})
         return sorted(matches, key=lambda x: x["score"], reverse=True)
