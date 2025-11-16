@@ -27,6 +27,20 @@ def main():
         st.stop()
 
     st.set_page_config(layout="wide")
+
+    st.markdown("""
+        <style>
+        h1 > div > a,
+        h2 > div > a,
+        h3 > div > a,
+        h4 > div > a,
+        h5 > div > a,
+        h6 > div > a {
+            display: none !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+    
     st.title("👨‍💼 Варіант 5: Біржа праці")
     st.caption("Виконав Петрощук Б. С., ФКНТ, Б-121-24-1-ПІ")
 
